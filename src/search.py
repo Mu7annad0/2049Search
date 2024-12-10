@@ -63,8 +63,7 @@ class Ingestor:
             return None
 
 
-
-def retrieval(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
+def retrievar(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
 
     template = """
     Relevant Information: {context}
@@ -87,4 +86,16 @@ def retrieval(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
         return_source_documents=True
     )
 
+
+def _init_llm():
+    try: 
+        return ChatOllama(
+            model = "gemma2:9b",
+            temperature = 0.0,
+            max_tokens = 1000
+        )
+    except Exception as e:
+        print(f"Error initializing LLM: {e}")
+        return None
+        
 
