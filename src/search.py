@@ -121,7 +121,7 @@ def retrievar(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
     return retrieval_chain
 
 
-def __init__llm():
+def _init_llm():
     """
     Initialize the language model.
 
@@ -145,7 +145,7 @@ class SearchEngine:
         """
         Initialize the SearchEngine with a language model and ingestor.
         """
-        self.llm = __init__llm()
+        self.llm = _init_llm()
         self.ingestor = Ingestor()
 
     def perform_search(self, question: str) -> Dict[str, Any]:
