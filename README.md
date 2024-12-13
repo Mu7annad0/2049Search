@@ -30,12 +30,12 @@ https://github.com/user-attachments/assets/356a6044-d84f-41ca-9c9d-5bdddaf7f71d
     ollama serve
     ```
 
-6. Sing-up in Tavily and get the API
+6. Sign-up in Tavily and get the API
    * https://tavily.com/
 
 7. Add your api in the .env file
    ```sh
-    TAVILY_API_KEY = "Add your api"
+    TAVILY_API_KEY = "Add-your-api-key"
     ```
 
 8. Run the application
