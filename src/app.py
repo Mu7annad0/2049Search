@@ -1,82 +1,70 @@
-import os
 import streamlit as st
 from search import SearchEngine
 
 def main():
     # Set up the Streamlit page
     st.set_page_config(page_title="2049", page_icon="🔍", layout="centered", initial_sidebar_state="auto")
+    
+    # Custom CSS to center content, add button hover effect, and style input
+    st.markdown("""
+    <style>
+    .reportview-container .main .block-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    /* Style for the input */
+    .stTextInput > div > div > input {
+        text-align: left;
+        border-color: #1E90FF;
+    }
+    .stTextInput > div > div > input::placeholder {
+        text-align: left;
+    }
+    /* Style for the Search button */
+    .stButton > button {
+        display: block;
+        margin: 0 auto;
+    }
+    /* Button hover effect */
+    .stButton > button:hover {
+        border-color: #1E90FF !important;
+        color: #1E90FF !important;
+    }
+    /* Title alignment */
+    h1 {
+        text-align: left;
+        width: 100%;
+    }
+    /* Added centered text above input with spacing */
+    .centered-text {
+        text-align: center;
+        font-size: 1.3rem;
+        margin-top: 2rem;  /* Add top margin */
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    # Add white background and theme styles
-    st.markdown(
-        """
-        <style>
-        body {
-            background-color: white;
-            color: black;
-        }
-        .main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .query-input {
-            width: 60%;
-        }
-        .examples {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 5px; /* Moved up */
-        }
-        .example-button {
-            background-color: transparent;
-            border: 2px solid #1E90FF;
-            border-radius: 10px;
-            padding: 5px 15px;
-            cursor: pointer;
-            text-align: center;
-            color: #1E90FF;
-        }
-        .example-button:hover {
-            background-color: #ADD8E6;
-        }
-        .search-button {
-            background-color: #1E90FF;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 10px;
-        }
-        .search-button:hover {
-            background-color: #1560BD;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # Title
-    st.markdown(
-        """<h1 style='text-align: center;'>Orbit.2049""",
-        unsafe_allow_html=True,
-    )
-
-    # Create an instance of the Search class
     search_engine = SearchEngine()
 
-    # Input for search query
-    query = st.text_input("", placeholder="What would you like to know?", key="query", label_visibility="collapsed")
+    # Left-aligned title
+    st.markdown(
+        """<h1>Orbit.<span style='color: #1E90FF;'>2049</span></h1>""",
+        unsafe_allow_html=True,
+    )
 
-    # Centering the button
-    col1, col2, col3 = st.columns([3, 1, 3])
-    with col2:
-        search_pressed = st.button("Search", key="search", use_container_width=True)
+    # Add centered text above input
+    st.markdown(
+        """<div class="centered-text">What would you like to know?</div>""",
+        unsafe_allow_html=True,
+    )
 
-    # If search button is clicked or query is not empty
-    if search_pressed or query:
+    # Input for search query with centered placeholder
+    query = st.text_input("", placeholder="Ask Anything...", 
+                           key="search_query")
+                           
+    # Search button
+    if st.button("Search"): 
         if query:
             # Show loading spinner
             with st.spinner("Searching and analyzing results..."):
@@ -95,19 +83,48 @@ def main():
                         st.markdown(f"- [{source['title']}]({source['url']})")
                     else:
                         st.markdown(f"- {source['title']}")
+            else:
+                print("No sources found..")
 
+    st.session_state.search_performed = False
     # Examples section
-    st.markdown("<div style='text-align: center; margin-top: 20px;'><h3>Examples</h3></div>", unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class='examples' style='justify-content: center;'>
-            <div class='example-button' onclick="document.getElementById('query').value='Best honeymoon locations?';">Best honeymoon locations?</div>
-            <div class='example-button' onclick="document.getElementById('query').value='How does GPT work?';">How does GPT work?</div>
-            <div class='example-button' onclick="document.getElementById('query').value='Who’s the director of Anora?';">Who’s the director of Anora?</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        if st.button("How did Alfred Hitchcock build suspense in his movies?"):
+            query = 'How did Alfred Hitchcock build suspense in his movies?'
+            st.session_state.search_performed = True
+    with col5:
+        if st.button("What are the main challenges in developing general AI?"):
+            query = 'What are the main challenges in developing general AI?'
+            st.session_state.search_performed = True
+    with col6:
+        if st.button("How do glaciers contribute to global sea levels?"):
+            query = 'How do glaciers contribute to global sea levels?'
+            st.session_state.search_performed = True
+
+    if st.session_state.get('search_performed', True):
+        if query:
+            # Show loading spinner
+            with st.spinner("Searching and analyzing results.."):
+                # Perform the search
+                result = search_engine.perform_search(query)
+
+            # Display the answer
+            st.subheader("Answer")
+            st.write(result["answer"])
+
+            # Display sources
+            if result["sources"]:
+                st.subheader("Sources")
+                for source in result["sources"]:
+                    if source["url"]:
+                        st.markdown(f"- [{source['title']}]({source['url']})")
+                    else:
+                        st.markdown(f"- {source['title']}")
+            else:
+                print("No sources found.")
+
 
 # Required dependencies
 if __name__ == "__main__":
