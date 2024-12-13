@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/356a6044-d84f-41ca-9c9d-5bdddaf7f71d
 ## Installation
 1. Clone the Repository
     ```sh
-    git colne git@github.com:Mu7annad0/2049Search.git
+    git clone git@github.com:Mu7annad0/2049Search.git
     cd 2049Search
     ```
 
