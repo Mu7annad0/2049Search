@@ -12,6 +12,9 @@ from langchain.chains import RetrievalQA
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tavily import TavilyClient
 
+from config import Config
+cfg = Config()
+
 
 class Ingestor:
     """
@@ -31,7 +34,10 @@ class Ingestor:
         )
     
     def __init__embeddings(self):
-        return HuggingFaceEmbeddings(model_name="thenlper/gte-small") 
+        """
+        Intialize the embedding model
+        """
+        return HuggingFaceEmbeddings(model_name=cfg.embedding_model) 
 
     def ingest(self, question: str) -> VectorStore:
         """
@@ -44,7 +50,9 @@ class Ingestor:
             VectorStore: A vector store of processed documents or None if an error occurs.
         """
         try:
-            result = self.tavily_client.search(question, max_results=6)
+
+            # using tavily api
+            result = self.tavily_client.search(question, max_results=cfg.max_search_results)
 
             documents = []
             for item in result['results']:
@@ -88,11 +96,11 @@ def retrievar(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
     Instructions:
     - Focus on clarity and ensure the response is easy to understand.
     - Structure the answer logically with an introduction, main points, and conclusion.
-    - Ensure the information is relevant and accurate.
     - Use bullet points to clearly express the main points of the answer.
-    - Present the response in a positive and engaging manner.
+    - Present the response in a positive, engaging, and professional manner.
+    - Ensure the information is relevant, accurate, and thoroughly addressed.
 
-    Please provide a comprehensive and well-organized response using the above information.
+    Please provide a comprehensive, detailed, and well-organized response using the above information and directives.
     """
 
     prompt = PromptTemplate(
@@ -104,7 +112,7 @@ def retrievar(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
         llm=llm,
         chain_type="stuff",
         retriever=vector_store.as_retriever(
-            search_kwargs={"k": 5}
+            search_kwargs={"k": cfg.retrieved_docs_limits}
         ),
         verbose=True,
         chain_type_kwargs={"prompt": prompt},
@@ -113,7 +121,7 @@ def retrievar(llm: BaseLanguageModel, vector_store: Optional[VectorStore]):
     return retrieval_chain
 
 
-def _init_llm():
+def __init__llm():
     """
     Initialize the language model.
 
@@ -122,9 +130,9 @@ def _init_llm():
     """
     try:
         return ChatOllama(
-            model="gemma2:9b",
-            temperature=0.0,
-            max_tokens=1000
+            model=cfg.model_name,
+            temperature=cfg.tempreature,
+            max_tokens=cfg.max_num_tokens
         )
     except Exception as e:
         print(f"Error initializing LLM: {e}")
@@ -137,7 +145,7 @@ class SearchEngine:
         """
         Initialize the SearchEngine with a language model and ingestor.
         """
-        self.llm = _init_llm()
+        self.llm = __init__llm()
         self.ingestor = Ingestor()
 
     def perform_search(self, question: str) -> Dict[str, Any]:
@@ -183,16 +191,13 @@ class SearchEngine:
             }
 
 
-def main():
+def run_example():
     """
-    Main function to demonstrate search functionality.
+    function to demonstrate search functionality.
     """
     query = "who is the head coach of manchester united now"
     search = SearchEngine()
     result = search.perform_search(query)
     print(result)
 
-
-if __name__ == "__main__":
-    # main()
-    print()
+# run_example()
