@@ -33,9 +33,9 @@ https://github.com/user-attachments/assets/356a6044-d84f-41ca-9c9d-5bdddaf7f71d
 6. Sign-up in Tavily and get the API
    * https://tavily.com/
 
-7. Add your api in the .env file
+7. Add your tavilyapi
    ```sh
-    TAVILY_API_KEY = "Add-your-api-key"
+    export TAVILY_API_KEY=<your tavily api>
     ```
 
 8. Run the application
